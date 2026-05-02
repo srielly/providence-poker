@@ -1,0 +1,133 @@
+{
+  "players": [
+    { "id": 1,  "name": "Marcus R.",  "active": true },
+    { "id": 2,  "name": "Diana L.",   "active": true },
+    { "id": 3,  "name": "Tom H.",     "active": true },
+    { "id": 4,  "name": "Priya K.",   "active": true },
+    { "id": 5,  "name": "Josh B.",    "active": true },
+    { "id": 6,  "name": "Rachel M.",  "active": true },
+    { "id": 7,  "name": "Carlos V.",  "active": true },
+    { "id": 8,  "name": "Steph W.",   "active": true },
+    { "id": 9,  "name": "Nate F.",    "active": true },
+    { "id": 10, "name": "Lena G.",    "active": true }
+  ],
+  "events": [
+    {
+      "id": "e1", "date": "2025-04-18", "name": "April Game",
+      "results": [
+        { "playerId": 1, "position": 1, "chop": false, "fireball": 10, "firenote": "Incredible river bluff" },
+        { "playerId": 3, "position": 2, "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 2, "position": 3, "chop": false, "fireball": 5,  "firenote": "Best hand of the night" },
+        { "playerId": 5, "position": 4, "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 4, "position": 5, "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 6, "position": 6, "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 7, "position": 7, "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 8, "position": 8, "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 9, "position": 9, "chop": false, "fireball": 0,  "firenote": "" }
+      ]
+    },
+    {
+      "id": "e2", "date": "2025-03-21", "name": "March Madness",
+      "results": [
+        { "playerId": 4,  "position": 1,  "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 1,  "position": 2,  "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 6,  "position": 3,  "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 2,  "position": 4,  "chop": false, "fireball": 15, "firenote": "Legendary slow-play" },
+        { "playerId": 3,  "position": 5,  "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 5,  "position": 6,  "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 7,  "position": 7,  "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 8,  "position": 8,  "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 9,  "position": 9,  "chop": false, "fireball": 0,  "firenote": "" },
+        { "playerId": 10, "position": 10, "chop": false, "fireball": 0,  "firenote": "" }
+      ]
+    },
+    {
+      "id": "e3", "date": "2025-02-14", "name": "Valentine's Game",
+      "results": [
+        { "playerId": 2, "position": 1, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 5, "position": 2, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 1, "position": 3, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 4, "position": 4, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 3, "position": 5, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 6, "position": 6, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 8, "position": 7, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 9, "position": 8, "chop": false, "fireball": 0, "firenote": "" }
+      ]
+    },
+    {
+      "id": "e4", "date": "2025-01-17", "name": "New Year Kickoff",
+      "results": [
+        { "playerId": 1, "position": 1, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 2, "position": 2, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 3, "position": 3, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 4, "position": 4, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 5, "position": 5, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 6, "position": 6, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 7, "position": 7, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 8, "position": 8, "chop": false, "fireball": 0, "firenote": "" }
+      ]
+    },
+    {
+      "id": "e5", "date": "2024-12-20", "name": "December Game",
+      "results": [
+        { "playerId": 3, "position": 1, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 6, "position": 2, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 1, "position": 3, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 5, "position": 4, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 2, "position": 5, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 7, "position": 6, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 4, "position": 7, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 9, "position": 8, "chop": false, "fireball": 0, "firenote": "" }
+      ]
+    },
+    {
+      "id": "e6", "date": "2024-11-15", "name": "November Game",
+      "results": [
+        { "playerId": 5,  "position": 1, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 4,  "position": 2, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 2,  "position": 3, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 1,  "position": 4, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 3,  "position": 5, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 6,  "position": 6, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 7,  "position": 7, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 10, "position": 8, "chop": false, "fireball": 0, "firenote": "" }
+      ]
+    },
+    {
+      "id": "e7", "date": "2024-10-18", "name": "October Game",
+      "results": [
+        { "playerId": 1, "position": 1, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 7, "position": 2, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 3, "position": 3, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 8, "position": 4, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 5, "position": 5, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 2, "position": 6, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 4, "position": 7, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 6, "position": 8, "chop": false, "fireball": 0, "firenote": "" }
+      ]
+    },
+    {
+      "id": "e8", "date": "2024-09-20", "name": "September Game",
+      "results": [
+        { "playerId": 2, "position": 1, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 3, "position": 2, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 1, "position": 3, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 6, "position": 4, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 8, "position": 5, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 5, "position": 6, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 4, "position": 7, "chop": false, "fireball": 0, "firenote": "" },
+        { "playerId": 7, "position": 8, "chop": false, "fireball": 0, "firenote": "" }
+      ]
+    }
+  ],
+  "upcoming": [
+    { "id": "u1", "month": "May 2025",  "host": "Tom H.",   "date": "May 16, 2025",  "confirmed": true  },
+    { "id": "u2", "month": "June 2025", "host": "Diana L.", "date": "June 20, 2025", "confirmed": true  },
+    { "id": "u3", "month": "July 2025", "host": null,       "date": null,            "confirmed": false },
+    { "id": "u4", "month": "Aug 2025",  "host": null,       "date": null,            "confirmed": false },
+    { "id": "u5", "month": "Sep 2025",  "host": null,       "date": null,            "confirmed": false },
+    { "id": "u6", "month": "Oct 2025",  "host": null,       "date": null,            "confirmed": false },
+    { "id": "u7", "month": "Nov 2025",  "host": null,       "date": null,            "confirmed": false },
+    { "id": "u8", "month": "Dec 2025",  "host": null,       "date": null,            "confirmed": false }
+  ]
+}
