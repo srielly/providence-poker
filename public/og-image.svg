@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#080a12"/>
+
+  <!-- Felt texture (subtle diagonal lines) -->
+  <defs>
+    <pattern id="felt" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="8" x2="8" y2="0" stroke="#ffffff" stroke-width="0.5" opacity="0.03"/>
+    </pattern>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c8a85a"/>
+      <stop offset="100%" style="stop-color:#e0c070"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#felt)"/>
+
+  <!-- Gold border frame -->
+  <rect x="32" y="32" width="1136" height="566" rx="12" fill="none" stroke="rgba(200,168,90,0.2)" stroke-width="1.5"/>
+  <rect x="40" y="40" width="1120" height="550" rx="8" fill="none" stroke="rgba(200,168,90,0.08)" stroke-width="1"/>
+
+  <!-- Large fleur-de-lis (centered, left of text) -->
+  <g transform="translate(220, 315) scale(2.8)" fill="url(#goldGrad)" opacity="0.9">
+    <path d="M50 8 C45 22 31 27 31 41 C31 53 41 58 50 58 C59 58 69 53 69 41 C69 27 55 22 50 8Z"/>
+    <path d="M50 58 C50 58 35 63 28 73 C22 81 30 89 38 86 C44 84 50 76 50 76 C50 76 56 84 62 86 C70 89 78 81 72 73 C65 63 50 58 50 58Z"/>
+    <ellipse cx="50" cy="63" rx="8" ry="5"/>
+    <path d="M16 36 C9 31 6 23 13 19 C19 16 26 21 29 31 C31 39 26 46 21 49 C19 43 19 41 16 36Z"/>
+    <path d="M84 36 C91 31 94 23 87 19 C81 16 74 21 71 31 C69 39 74 46 79 49 C81 43 81 41 84 36Z"/>
+  </g>
+
+  <!-- Vertical divider -->
+  <line x1="420" y1="140" x2="420" y2="490" stroke="rgba(200,168,90,0.2)" stroke-width="1.5"/>
+
+  <!-- Season label -->
+  <text x="470" y="220" font-family="Georgia, serif" font-size="22" fill="rgba(200,168,90,0.6)" letter-spacing="6">2026 SEASON</text>
+
+  <!-- Main title -->
+  <text x="470" y="315" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#e8dfc8" letter-spacing="2">PROVIDENCE</text>
+  <text x="470" y="395" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#c8a85a" letter-spacing="2">POKER</text>
+
+  <!-- Subtitle -->
+  <text x="472" y="454" font-family="Arial, sans-serif" font-size="22" fill="rgba(232,223,200,0.4)" letter-spacing="3">MONTHLY LEAGUE · ANNUAL STANDINGS</text>
+
+  <!-- Decorative gold line under season label -->
+  <line x1="470" y1="235" x2="800" y2="235" stroke="rgba(200,168,90,0.25)" stroke-width="1"/>
+</svg>

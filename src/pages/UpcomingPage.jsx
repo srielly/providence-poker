@@ -37,7 +37,7 @@ export default function UpcomingPage() {
 
       <div style={{ marginBottom: 36 }}>
         <div style={{ fontSize: 11, letterSpacing: '0.2em', color: G.goldDim, marginBottom: 8, textTransform: 'uppercase' }}>
-          2025 Season
+          2026 Season
         </div>
         <h1 style={{ fontFamily: SERIF, fontSize: 34, fontWeight: 700, color: G.text, lineHeight: 1.1, marginBottom: 12 }}>
           Upcoming Games

@@ -56,7 +56,7 @@ export default function Nav() {
           color:         G.textFaint,
           paddingLeft:   6,
           borderLeft:    `1px solid ${G.border}`,
-        }}>2025</span>
+        }}>2026</span>
       </button>
 
       {/* Links */}

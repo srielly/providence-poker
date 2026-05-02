@@ -48,7 +48,7 @@ export default function HomePage() {
       }}>
         <div>
           <div style={{ fontSize: 11, letterSpacing: '0.2em', color: G.goldDim, marginBottom: 8, textTransform: 'uppercase' }}>
-            2025 Season · Annual Leaderboard
+            2026 Season · Annual Leaderboard
           </div>
           <h1 style={{ fontFamily: SERIF, fontSize: 34, fontWeight: 700, color: G.text, lineHeight: 1.1 }}>
             Standings

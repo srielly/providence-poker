@@ -7,7 +7,7 @@ import { FleurDeLis, LockIcon, CheckIcon } from '../components/icons';
 import { saveData, saveUpcoming } from '../lib/dataLayer';
 import { calcEventResults, positionPoints, PARTICIPATION } from '../lib/scoring';
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'poker2025';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'poker2026';
 
 // ─── Login screen ─────────────────────────────────────────────────────────────
 function LoginScreen({ onLogin }) {
