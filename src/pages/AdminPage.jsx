@@ -4,8 +4,8 @@ import { G, SERIF } from '../lib/tokens';
 import GoldDivider from '../components/GoldDivider';
 import GoldBtn from '../components/GoldBtn';
 import { FleurDeLis, LockIcon, CheckIcon } from '../components/icons';
-import { saveData, saveUpcoming } from '../lib/dataLayer';
-import { calcEventResults, positionPoints, PARTICIPATION } from '../lib/scoring';
+import { saveData, saveEvent, saveUpcoming } from '../lib/dataLayer';
+import { calcEventResults, positionPoints, PARTICIPATION, fmtDate } from '../lib/scoring';
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'poker2026';
 
@@ -412,8 +412,243 @@ function ScheduleTab() {
   );
 }
 
+// ─── Tab: Edit Games ──────────────────────────────────────────────────────────
+function EditGamesTab() {
+  const { data, setData } = useContext(DataContext);
+  const [editing,   setEditing]   = useState(null);
+  const [eventDate, setEventDate] = useState('');
+  const [eventName, setEventName] = useState('');
+  const [query,     setQuery]     = useState('');
+  const [results,   setResults]   = useState([]);
+  const [saved,     setSaved]     = useState(false);
+  const [deleting,  setDeleting]  = useState(null);
+
+  const sortedEvents = [...data.events].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  function openEdit(event) {
+    setEditing(event);
+    setEventDate(event.date);
+    setEventName(event.name);
+    setResults(event.results.map(r => ({
+      playerId: r.playerId,
+      position: r.position,
+      chop:     r.chop || false,
+      fireball: r.fireball || 0,
+      firenote: r.firenote || '',
+    })));
+    setSaved(false);
+    setQuery('');
+  }
+
+  function closeEdit() {
+    setEditing(null);
+    setResults([]);
+  }
+
+  const used        = new Set(results.map(r => r.playerId));
+  const suggestions = data.players.filter(p =>
+    !used.has(p.id) && p.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  function addPlayer(player) {
+    setResults(prev => [...prev, { playerId: player.id, position: prev.length + 1, chop: false, fireball: 0, firenote: '' }]);
+    setQuery('');
+  }
+
+  function removePlayer(idx) {
+    setResults(prev => prev.filter((_, i) => i !== idx).map((r, i) => ({ ...r, position: i + 1 })));
+  }
+
+  function updateResult(idx, field, value) {
+    setResults(prev => prev.map((r, i) => i === idx ? { ...r, [field]: value } : r));
+  }
+
+  async function handleSave() {
+    if (!eventDate || !eventName || results.length === 0) return;
+    const updated = await saveEvent({
+      ...editing,
+      date:    eventDate,
+      name:    eventName,
+      results: results.map(r => ({
+        playerId: r.playerId,
+        position: r.position,
+        chop:     r.chop,
+        fireball: Number(r.fireball) || 0,
+        firenote: r.firenote,
+      })),
+    });
+    setData(updated);
+    setSaved(true);
+    setTimeout(() => { setSaved(false); closeEdit(); }, 2000);
+  }
+
+  async function handleDelete(event) {
+    const events  = data.events.filter(e => e.id !== event.id);
+    const updated = { ...data, events };
+    await saveData(updated);
+    setData(updated);
+    setDeleting(null);
+  }
+
+  // ── Edit form ────────────────────────────────────────────────────────────────
+  if (editing) {
+    return (
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+          <button
+            onClick={closeEdit}
+            style={{ background: 'none', border: 'none', color: G.textDim, cursor: 'pointer', fontSize: 13, padding: 0, letterSpacing: '0.04em' }}
+            onMouseEnter={e => { e.currentTarget.style.color = G.gold; }}
+            onMouseLeave={e => { e.currentTarget.style.color = G.textDim; }}
+          >← Back</button>
+          <GoldDivider label={`Editing: ${editing.name}`} />
+        </div>
+
+        {saved && (
+          <div style={{
+            background: 'rgba(80,200,100,0.08)', border: '1px solid rgba(80,200,100,0.25)',
+            borderRadius: 6, padding: '10px 16px', marginBottom: 16,
+            fontSize: 13, color: 'rgba(120,220,130,0.9)', display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <CheckIcon size={14} color="rgba(120,220,130,0.9)" />
+            Event updated!
+          </div>
+        )}
+
+        <div className="admin-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 4 }}>
+          <div>
+            <label style={{ fontSize: 10, color: G.textFaint, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Date</label>
+            <input type="date" value={eventDate} onChange={e => setEventDate(e.target.value)} />
+          </div>
+          <div>
+            <label style={{ fontSize: 10, color: G.textFaint, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Event Name</label>
+            <input placeholder="e.g. May Game" value={eventName} onChange={e => setEventName(e.target.value)} />
+          </div>
+        </div>
+
+        <div style={{ marginTop: 24, position: 'relative' }}>
+          <label style={{ fontSize: 10, color: G.textFaint, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Players (in finishing order)</label>
+          <input placeholder="Search player name…" value={query} onChange={e => setQuery(e.target.value)} />
+          {query && suggestions.length > 0 && (
+            <div style={{
+              position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20,
+              background: '#0e1120', border: `1px solid ${G.border}`,
+              borderRadius: 4, marginTop: 2, overflow: 'hidden',
+            }}>
+              {suggestions.map(p => (
+                <div
+                  key={p.id}
+                  onClick={() => addPlayer(p)}
+                  style={{ padding: '10px 14px', fontSize: 13, color: G.text, cursor: 'pointer', borderBottom: `1px solid rgba(200,168,90,0.07)` }}
+                  onMouseEnter={e => { e.currentTarget.style.background = G.goldFaint; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                >{p.name}</div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {results.length > 0 && (
+          <div style={{ marginTop: 20 }}>
+            <div className="admin-res-header" style={{
+              display: 'grid', gridTemplateColumns: '36px 1fr 80px 80px 80px 28px',
+              padding: '0 8px 8px',
+              fontSize: 9, letterSpacing: '0.14em', color: G.textFaint, textTransform: 'uppercase',
+            }}>
+              <span>Pos</span><span>Player</span>
+              <span style={{ textAlign: 'center' }}>Chop</span>
+              <span style={{ textAlign: 'center' }}>🔥 Pts</span>
+              <span className="admin-note">Note</span>
+              <span />
+            </div>
+
+            {results.map((r, idx) => {
+              const player = data.players.find(p => p.id === r.playerId);
+              return (
+                <div key={r.playerId} className="admin-res-row" style={{
+                  display: 'grid', gridTemplateColumns: '36px 1fr 80px 80px 80px 28px',
+                  alignItems: 'center', gap: 8, padding: '8px',
+                  background: idx % 2 === 0 ? 'rgba(200,168,90,0.02)' : 'transparent',
+                  borderRadius: 4, marginBottom: 4,
+                }}>
+                  <span style={{ fontSize: 13, color: G.textDim, textAlign: 'center' }}>{r.position}</span>
+                  <span style={{ fontSize: 13, color: G.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player?.name}</span>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <input type="checkbox" checked={r.chop} onChange={e => updateResult(idx, 'chop', e.target.checked)} style={{ width: 'auto', cursor: 'pointer' }} />
+                  </div>
+                  <input
+                    type="number" min="0" value={r.fireball || ''} placeholder="0"
+                    onChange={e => updateResult(idx, 'fireball', e.target.value)}
+                    style={{ padding: '6px 10px', fontSize: 13, textAlign: 'center' }}
+                  />
+                  <input
+                    className="admin-note" placeholder="reason…" value={r.firenote}
+                    onChange={e => updateResult(idx, 'firenote', e.target.value)}
+                    style={{ padding: '6px 10px', fontSize: 12 }}
+                  />
+                  <button
+                    onClick={() => removePlayer(idx)}
+                    style={{ background: 'none', border: 'none', color: G.textFaint, cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 0 }}
+                    onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,100,100,0.7)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = G.textFaint; }}
+                  >×</button>
+                </div>
+              );
+            })}
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+              <GoldBtn onClick={handleSave} disabled={!eventDate || !eventName || results.length === 0}>
+                Save Changes
+              </GoldBtn>
+              <GoldBtn ghost small onClick={closeEdit}>Cancel</GoldBtn>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Event list ───────────────────────────────────────────────────────────────
+  return (
+    <div>
+      <GoldDivider label="Past Events" right={`${data.events.length} events`} />
+      <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {sortedEvents.map(event => (
+          <div key={event.id} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 16px',
+            background: G.goldFaint, border: `1px solid rgba(200,168,90,0.15)`,
+            borderRadius: 6,
+          }}>
+            <div>
+              <div style={{ fontSize: 14, color: G.text, marginBottom: 2 }}>{event.name}</div>
+              <div style={{ fontSize: 12, color: G.textDim }}>
+                {fmtDate(event.date)} · {event.results.length} players
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {deleting === event.id ? (
+                <>
+                  <span style={{ fontSize: 12, color: G.textDim }}>Delete?</span>
+                  <GoldBtn small onClick={() => handleDelete(event)}>Yes</GoldBtn>
+                  <GoldBtn small ghost onClick={() => setDeleting(null)}>No</GoldBtn>
+                </>
+              ) : (
+                <>
+                  <GoldBtn small onClick={() => openEdit(event)}>Edit</GoldBtn>
+                  <GoldBtn small ghost onClick={() => setDeleting(event.id)}>Delete</GoldBtn>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Admin Page ───────────────────────────────────────────────────────────────
-const TABS = ['Enter Results', 'Players', 'Schedule'];
+const TABS = ['Enter Results', 'Players', 'Schedule', 'Edit Games'];
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -463,6 +698,7 @@ export default function AdminPage() {
       {tab === 0 && <EnterResultsTab />}
       {tab === 1 && <PlayersTab />}
       {tab === 2 && <ScheduleTab />}
+      {tab === 3 && <EditGamesTab />}
     </div>
   );
 }
