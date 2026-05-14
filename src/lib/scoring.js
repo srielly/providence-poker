@@ -1,5 +1,5 @@
 // ─── Scoring Engine ───────────────────────────────────────────────────────────
-export const POSITION_POINTS = { 1:100, 2:75, 3:55, 4:40, 5:30, 6:22, 7:15, 8:10, 9:6, 10:3 };
+export const POSITION_POINTS = { 1:100, 2:75, 3:55, 4:40, 5:30, 6:20 };
 export const PARTICIPATION = 5;
 
 export function positionPoints(pos) {

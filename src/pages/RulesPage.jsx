@@ -71,8 +71,8 @@ export default function RulesPage() {
             borderRadius: 6, padding: '14px 18px',
           }}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: G.text, marginBottom: 2 }}>Participation</div>
-              <div style={{ fontSize: 12, color: G.textFaint }}>Awarded to every player who plays</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: G.text, marginBottom: 2 }}>Attendance</div>
+              <div style={{ fontSize: 12, color: G.textFaint }}>Awarded to every player — the only points for 7th place and beyond</div>
             </div>
             <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: G.gold }}>+5</span>
           </div>
@@ -98,7 +98,7 @@ export default function RulesPage() {
             When two or more players chop, the points for the chopped positions are averaged equally among them.
           </BulletItem>
           <BulletItem>
-            Each chopped player also receives the +5 participation bonus.
+            Each chopped player also receives the +5 attendance bonus.
           </BulletItem>
           <BulletItem>
             Example: 3-way chop of 1st/2nd/3rd = (100 + 75 + 55) ÷ 3 = <strong style={{ color: G.gold }}>76.7 pts</strong> each.
