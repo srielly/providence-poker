@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { G, SERIF } from '../lib/tokens';
 import { FleurDeLis, LockIcon } from './icons';
@@ -8,15 +9,53 @@ const NAV_ITEMS = [
   { label: 'Rules',     path: '/rules' },
 ];
 
+function HamburgerIcon({ open }) {
+  return (
+    <div style={{ width: 20, height: 14, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      {[0, 1, 2].map(i => (
+        <span key={i} style={{
+          display:         'block',
+          height:          2,
+          background:      G.gold,
+          borderRadius:    1,
+          transition:      'transform 0.2s, opacity 0.2s',
+          transformOrigin: 'center',
+          opacity:         open && i === 1 ? 0 : 1,
+          transform:       open
+            ? i === 0 ? 'translateY(6px) rotate(45deg)'
+            : i === 2 ? 'translateY(-6px) rotate(-45deg)'
+            : 'none'
+            : 'none',
+        }} />
+      ))}
+    </div>
+  );
+}
+
 export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navRef = useRef(null);
 
   const isActive = (path) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e) => {
+      if (navRef.current && !navRef.current.contains(e.target)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
+
+  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+
+  const goTo = (path) => { navigate(path); setMenuOpen(false); };
+
   return (
-    <nav style={{
+    <nav ref={navRef} style={{
       position:       'sticky',
       top:            0,
       zIndex:         100,
@@ -31,7 +70,7 @@ export default function Nav() {
 
       {/* Logo */}
       <button
-        onClick={() => navigate('/')}
+        onClick={() => goTo('/')}
         style={{
           display:    'flex',
           alignItems: 'center',
@@ -59,14 +98,14 @@ export default function Nav() {
         }}>2026</span>
       </button>
 
-      {/* Links */}
-      <div style={{ display: 'flex', alignItems: 'stretch', gap: 4 }}>
+      {/* Desktop links */}
+      <div className="nav-links" style={{ display: 'flex', alignItems: 'stretch', gap: 4 }}>
         {NAV_ITEMS.map(item => {
           const active = isActive(item.path);
           return (
             <button
               key={item.path}
-              onClick={() => navigate(item.path)}
+              onClick={() => goTo(item.path)}
               style={{
                 padding:       '0 18px',
                 background:    'none',
@@ -87,8 +126,7 @@ export default function Nav() {
         })}
 
         <button
-          onClick={() => navigate('/admin')}
-          className="nav-admin"
+          onClick={() => goTo('/admin')}
           style={{
             padding:    '0 14px',
             background: 'none',
@@ -110,6 +148,85 @@ export default function Nav() {
           Admin
         </button>
       </div>
+
+      {/* Mobile hamburger button */}
+      <button
+        className="nav-hamburger"
+        onClick={() => setMenuOpen(o => !o)}
+        style={{
+          display:    'none',
+          alignItems: 'center',
+          padding:    '0 4px',
+          background: 'none',
+          border:     'none',
+          cursor:     'pointer',
+        }}
+        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+      >
+        <HamburgerIcon open={menuOpen} />
+      </button>
+
+      {/* Mobile dropdown */}
+      {menuOpen && (
+        <div className="nav-mobile-menu" style={{
+          position:       'absolute',
+          top:            '100%',
+          left:           0,
+          right:          0,
+          background:     'rgba(8,10,18,0.98)',
+          backdropFilter: 'blur(12px)',
+          borderBottom:   `1px solid ${G.border}`,
+          paddingBottom:  8,
+        }}>
+          {NAV_ITEMS.map(item => {
+            const active = isActive(item.path);
+            return (
+              <button
+                key={item.path}
+                onClick={() => goTo(item.path)}
+                style={{
+                  display:     'flex',
+                  alignItems:  'center',
+                  width:       '100%',
+                  padding:     '14px 24px',
+                  background:  'none',
+                  border:      'none',
+                  borderLeft:  active ? `2px solid ${G.gold}` : `2px solid transparent`,
+                  fontSize:    15,
+                  fontWeight:  500,
+                  color:       active ? G.gold : G.textDim,
+                  cursor:      'pointer',
+                  fontFamily:  "'DM Sans', sans-serif",
+                  textAlign:   'left',
+                }}
+              >{item.label}</button>
+            );
+          })}
+          <button
+            onClick={() => goTo('/admin')}
+            style={{
+              display:     'flex',
+              alignItems:  'center',
+              width:       '100%',
+              padding:     '14px 24px',
+              background:  'none',
+              border:      'none',
+              borderLeft:  isActive('/admin') ? `2px solid ${G.gold}` : `2px solid transparent`,
+              borderTop:   `1px solid ${G.border}`,
+              marginTop:   8,
+              gap:         8,
+              fontSize:    13,
+              color:       isActive('/admin') ? G.gold : G.textFaint,
+              cursor:      'pointer',
+              fontFamily:  "'DM Sans', sans-serif",
+              letterSpacing: '0.04em',
+            }}
+          >
+            <LockIcon size={13} />
+            Admin
+          </button>
+        </div>
+      )}
     </nav>
   );
 }

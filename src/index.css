@@ -36,12 +36,17 @@ select option { background: #0e1120; color: #e8dfc8; }
 button { cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
 /* ── Responsive ── */
+.nav-hamburger  { display: none; }
+.nav-mobile-menu { display: none; }
+
 @media (max-width: 640px) {
   .page-pad     { padding: 24px 16px 60px !important; }
   .nav-pad      { padding: 0 16px !important; }
   .nav-year     { display: none !important; }
-  .nav-admin    { display: none !important; }
   .nav-logo     { font-size: 14px !important; }
+  .nav-links    { display: none !important; }
+  .nav-hamburger  { display: flex !important; }
+  .nav-mobile-menu { display: block !important; }
 
   .leader-box   { flex-direction: column !important; gap: 16px !important; align-items: flex-start !important; }
 
