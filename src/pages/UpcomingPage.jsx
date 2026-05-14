@@ -12,24 +12,34 @@ export default function UpcomingPage() {
   const [hostName,   setHostName]   = useState('');
   const [hostDate,   setHostDate]   = useState('');
   const [flashId,    setFlashId]    = useState(null);
+  const [saving,     setSaving]     = useState(false);
+  const [saveError,  setSaveError]  = useState(null);
 
   const confirmed = data.upcoming.filter(u => u.confirmed);
   const open      = data.upcoming.filter(u => !u.confirmed);
 
   async function handleClaim(slotId) {
     if (!hostName.trim()) return;
-    const updated = data.upcoming.map(u =>
-      u.id === slotId
-        ? { ...u, host: hostName.trim(), date: hostDate.trim() || null, confirmed: true }
-        : u
-    );
-    const newData = await saveUpcoming(updated);
-    setData(newData);
-    setClaimingId(null);
-    setHostName('');
-    setHostDate('');
-    setFlashId(slotId);
-    setTimeout(() => setFlashId(null), 3000);
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const updated = data.upcoming.map(u =>
+        u.id === slotId
+          ? { ...u, host: hostName.trim(), date: hostDate || null, confirmed: true }
+          : u
+      );
+      const newData = await saveUpcoming(updated);
+      setData(newData);
+      setClaimingId(null);
+      setHostName('');
+      setHostDate('');
+      setFlashId(slotId);
+      setTimeout(() => setFlashId(null), 3000);
+    } catch (err) {
+      setSaveError(err?.message || 'Failed to save — please try again.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -166,22 +176,31 @@ export default function UpcomingPage() {
                       onChange={e => setHostName(e.target.value)}
                       autoFocus
                     />
-                    <input
-                      placeholder="Preferred date (optional)"
-                      value={hostDate}
-                      onChange={e => setHostDate(e.target.value)}
-                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <label style={{ fontSize: 11, color: G.goldDim, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                        Proposed Date (optional)
+                      </label>
+                      <input
+                        type="date"
+                        value={hostDate}
+                        onChange={e => setHostDate(e.target.value)}
+                      />
+                    </div>
+                    {saveError && (
+                      <div style={{ fontSize: 12, color: '#e05a5a', padding: '4px 0' }}>{saveError}</div>
+                    )}
                     <div style={{ display: 'flex', gap: 10 }}>
                       <GoldBtn
                         small
                         onClick={() => handleClaim(slot.id)}
-                        disabled={!hostName.trim()}
+                        disabled={!hostName.trim() || saving}
                       >
-                        Confirm
+                        {saving ? 'Saving…' : 'Confirm'}
                       </GoldBtn>
                       <GoldBtn
                         small ghost
-                        onClick={() => { setClaimingId(null); setHostName(''); setHostDate(''); }}
+                        onClick={() => { setClaimingId(null); setHostName(''); setHostDate(''); setSaveError(null); }}
+                        disabled={saving}
                       >
                         Cancel
                       </GoldBtn>
@@ -200,7 +219,7 @@ export default function UpcomingPage() {
         borderRadius: 6, padding: '14px 18px',
         fontSize: 12, color: G.textFaint, lineHeight: 1.6,
       }}>
-        <strong style={{ color: G.textDim }}>How claiming works:</strong> Tap "Claim This Month" and enter your name to volunteer as host. The admin can make changes from the Admin dashboard. Games are typically held on the third Friday of the month.
+        <strong style={{ color: G.textDim }}>How claiming works:</strong> Tap "Claim This Month" and enter your name to volunteer as host. The admin can make changes from the Admin dashboard.
       </div>
     </div>
   );

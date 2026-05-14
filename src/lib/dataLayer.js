@@ -124,6 +124,12 @@ export async function getUpcoming() {
   return data
 }
 
+export async function deleteEvent(eventId) {
+  const { error } = await supabase.from('events').delete().eq('id', eventId)
+  if (error) throw error
+  return fetchAll()
+}
+
 export async function deletePlayer(playerId) {
   const { error: re } = await supabase.from('event_results').delete().eq('player_id', playerId)
   if (re) throw re

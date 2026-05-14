@@ -4,7 +4,7 @@ import { G, SERIF } from '../lib/tokens';
 import GoldDivider from '../components/GoldDivider';
 import GoldBtn from '../components/GoldBtn';
 import { FleurDeLis, LockIcon, CheckIcon } from '../components/icons';
-import { saveData, saveEvent, saveUpcoming, deletePlayer } from '../lib/dataLayer';
+import { saveData, saveEvent, saveUpcoming, deletePlayer, deleteEvent } from '../lib/dataLayer';
 import { calcEventResults, positionPoints, PARTICIPATION, fmtDate } from '../lib/scoring';
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'poker2026';
@@ -59,6 +59,7 @@ function EnterResultsTab() {
   const [results,   setResults]   = useState([]); // { playerId, chop, fireball, firenote }
   const [preview,   setPreview]   = useState(false);
   const [saved,     setSaved]     = useState(false);
+  const [saveErr,   setSaveErr]   = useState('');
 
   const activePlayers = data.players.filter(p => p.active);
   const used          = new Set(results.map(r => r.playerId));
@@ -102,15 +103,19 @@ function EnterResultsTab() {
         firenote: r.firenote,
       })),
     };
-    const updated = { ...data, events: [newEvent, ...data.events] };
-    await saveData(updated);
-    setData(updated);
-    setSaved(true);
-    setResults([]);
-    setEventDate('');
-    setEventName('');
-    setPreview(false);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      setSaveErr('');
+      const updated = await saveEvent(newEvent);
+      setData(updated);
+      setSaved(true);
+      setResults([]);
+      setEventDate('');
+      setEventName('');
+      setPreview(false);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setSaveErr(err?.message || 'Save failed — check the console for details.');
+    }
   }
 
   function calcTotal(r) {
@@ -129,6 +134,16 @@ function EnterResultsTab() {
         }}>
           <CheckIcon size={14} color="rgba(120,220,130,0.9)" />
           Event saved and leaderboard updated!
+        </div>
+      )}
+
+      {saveErr && (
+        <div style={{
+          background: 'rgba(255,80,80,0.08)', border: '1px solid rgba(255,80,80,0.25)',
+          borderRadius: 6, padding: '10px 16px', marginTop: 16,
+          fontSize: 13, color: 'rgba(255,120,120,0.9)',
+        }}>
+          {saveErr}
         </div>
       )}
 
@@ -393,11 +408,43 @@ function PlayersTab() {
 // ─── Tab: Schedule ────────────────────────────────────────────────────────────
 function ScheduleTab() {
   const { data, setData } = useContext(DataContext);
+  const [editingId,  setEditingId]  = useState(null);
+  const [editMonth,  setEditMonth]  = useState('');
+  const [editHost,   setEditHost]   = useState('');
+  const [editDate,   setEditDate]   = useState('');
+  const [editConf,   setEditConf]   = useState(false);
+  const [saving,     setSaving]     = useState(false);
 
-  async function clearHost(slotId) {
-    const upcoming = data.upcoming.map(u =>
-      u.id === slotId ? { ...u, host: null, date: null, confirmed: false } : u
-    );
+  function openEdit(slot) {
+    setEditingId(slot.id);
+    setEditMonth(slot.month);
+    setEditHost(slot.host || '');
+    setEditDate(slot.date || '');
+    setEditConf(slot.confirmed);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+  }
+
+  async function saveEdit(slotId) {
+    setSaving(true);
+    try {
+      const upcoming = data.upcoming.map(u =>
+        u.id === slotId
+          ? { ...u, month: editMonth.trim(), host: editHost.trim() || null, date: editDate || null, confirmed: editConf }
+          : u
+      );
+      const updated = await saveUpcoming(upcoming);
+      setData(updated);
+      setEditingId(null);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function removeSlot(slotId) {
+    const upcoming = data.upcoming.filter(u => u.id !== slotId);
     const updated = await saveUpcoming(upcoming);
     setData(updated);
   }
@@ -407,27 +454,82 @@ function ScheduleTab() {
       <GoldDivider label="Upcoming Schedule" />
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {data.upcoming.map(slot => (
-          <div key={slot.id} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '12px 16px',
-            background: slot.confirmed ? G.goldFaint : 'rgba(232,223,200,0.02)',
-            border: `1px solid ${slot.confirmed ? 'rgba(200,168,90,0.2)' : G.border}`,
-            borderRadius: 6,
-          }}>
-            <div>
-              <div style={{ fontSize: 14, color: G.text, marginBottom: 2 }}>{slot.month}</div>
-              {slot.host && (
-                <div style={{ fontSize: 12, color: G.textDim }}>
-                  Host: <span style={{ color: G.gold }}>{slot.host}</span>
-                  {slot.date && ` · ${slot.date}`}
-                </div>
-              )}
-              {!slot.host && (
-                <div style={{ fontSize: 12, color: G.textFaint }}>No host yet</div>
-              )}
+          <div key={slot.id} style={{ borderRadius: 6, overflow: 'hidden' }}>
+            {/* Row */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '12px 16px',
+              background: slot.confirmed ? G.goldFaint : 'rgba(232,223,200,0.02)',
+              border: `1px solid ${slot.confirmed ? 'rgba(200,168,90,0.2)' : G.border}`,
+              borderRadius: editingId === slot.id ? '6px 6px 0 0' : 6,
+            }}>
+              <div>
+                <div style={{ fontSize: 14, color: G.text, marginBottom: 2 }}>{slot.month}</div>
+                {slot.host && (
+                  <div style={{ fontSize: 12, color: G.textDim }}>
+                    Host: <span style={{ color: G.gold }}>{slot.host}</span>
+                    {slot.date && ` · ${slot.date}`}
+                  </div>
+                )}
+                {!slot.host && (
+                  <div style={{ fontSize: 12, color: G.textFaint }}>No host yet</div>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <GoldBtn small ghost onClick={() => editingId === slot.id ? cancelEdit() : openEdit(slot)}>
+                  {editingId === slot.id ? 'Cancel' : 'Edit'}
+                </GoldBtn>
+                <GoldBtn small ghost onClick={() => removeSlot(slot.id)} style={{ color: '#e05a5a', borderColor: 'rgba(224,90,90,0.4)' }}>
+                  Remove
+                </GoldBtn>
+              </div>
             </div>
-            {slot.confirmed && (
-              <GoldBtn small ghost onClick={() => clearHost(slot.id)}>Clear</GoldBtn>
+
+            {/* Inline edit form */}
+            {editingId === slot.id && (
+              <div style={{
+                background: G.goldFaint,
+                border: `1px solid rgba(200,168,90,0.2)`,
+                borderTop: 'none',
+                borderRadius: '0 0 6px 6px',
+                padding: '14px 16px',
+                display: 'flex', flexDirection: 'column', gap: 10,
+              }}>
+                <input
+                  placeholder="Month label (e.g. June 2026)"
+                  value={editMonth}
+                  onChange={e => setEditMonth(e.target.value)}
+                  autoFocus
+                />
+                <input
+                  placeholder="Host name (optional)"
+                  value={editHost}
+                  onChange={e => setEditHost(e.target.value)}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <label style={{ fontSize: 11, color: G.goldDim, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Date (optional)</label>
+                  <input
+                    type="date"
+                    value={editDate}
+                    onChange={e => setEditDate(e.target.value)}
+                  />
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: G.textDim, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={editConf}
+                    onChange={e => setEditConf(e.target.checked)}
+                    style={{ width: 'auto', cursor: 'pointer' }}
+                  />
+                  Confirmed
+                </label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <GoldBtn small onClick={() => saveEdit(slot.id)} disabled={!editMonth.trim() || saving}>
+                    {saving ? 'Saving…' : 'Save'}
+                  </GoldBtn>
+                  <GoldBtn small ghost onClick={cancelEdit} disabled={saving}>Cancel</GoldBtn>
+                </div>
+              </div>
             )}
           </div>
         ))}
@@ -507,9 +609,7 @@ function EditGamesTab() {
   }
 
   async function handleDelete(event) {
-    const events  = data.events.filter(e => e.id !== event.id);
-    const updated = { ...data, events };
-    await saveData(updated);
+    const updated = await deleteEvent(event.id);
     setData(updated);
     setDeleting(null);
   }

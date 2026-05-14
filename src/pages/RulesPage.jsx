@@ -83,7 +83,7 @@ export default function RulesPage() {
           }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 600, color: G.text, marginBottom: 2 }}>🔥 Fireball</div>
-              <div style={{ fontSize: 12, color: G.textFaint }}>Voted by the table for exceptional play</div>
+              <div style={{ fontSize: 12, color: G.textFaint }}>Voted by the host for exceptional tomfoolery</div>
             </div>
             <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: G.gold }}>Variable</span>
           </div>
