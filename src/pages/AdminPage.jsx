@@ -4,7 +4,7 @@ import { G, SERIF } from '../lib/tokens';
 import GoldDivider from '../components/GoldDivider';
 import GoldBtn from '../components/GoldBtn';
 import { FleurDeLis, LockIcon, CheckIcon } from '../components/icons';
-import { saveData, saveEvent, saveUpcoming } from '../lib/dataLayer';
+import { saveData, saveEvent, saveUpcoming, deletePlayer } from '../lib/dataLayer';
 import { calcEventResults, positionPoints, PARTICIPATION, fmtDate } from '../lib/scoring';
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'poker2026';
@@ -298,6 +298,7 @@ function PlayersTab() {
   const { data, setData } = useContext(DataContext);
   const [adding,   setAdding]   = useState(false);
   const [newName,  setNewName]  = useState('');
+  const [deleting, setDeleting] = useState(null);
 
   async function addPlayer() {
     if (!newName.trim()) return;
@@ -320,6 +321,12 @@ function PlayersTab() {
     const updated = { ...data, players };
     await saveData(updated);
     setData(updated);
+  }
+
+  async function handleDelete(playerId) {
+    const updated = await deletePlayer(playerId);
+    setData(updated);
+    setDeleting(null);
   }
 
   return (
@@ -356,9 +363,26 @@ function PlayersTab() {
             opacity: p.active ? 1 : 0.55,
           }}>
             <span style={{ fontSize: 14, color: G.text }}>{p.name}</span>
-            <GoldBtn small ghost onClick={() => toggleActive(p.id)}>
-              {p.active ? 'Deactivate' : 'Reactivate'}
-            </GoldBtn>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {deleting === p.id ? (
+                <>
+                  <span style={{ fontSize: 12, color: G.textDim }}>Delete?</span>
+                  <GoldBtn small onClick={() => handleDelete(p.id)}>Yes</GoldBtn>
+                  <GoldBtn small ghost onClick={() => setDeleting(null)}>No</GoldBtn>
+                </>
+              ) : (
+                <>
+                  <GoldBtn small ghost onClick={() => toggleActive(p.id)}>
+                    {p.active ? 'Deactivate' : 'Reactivate'}
+                  </GoldBtn>
+                  <GoldBtn small ghost onClick={() => setDeleting(p.id)}
+                    style={{ color: 'rgba(255,100,100,0.7)', borderColor: 'rgba(255,100,100,0.25)' }}
+                  >
+                    Delete
+                  </GoldBtn>
+                </>
+              )}
+            </div>
           </div>
         ))}
       </div>
